@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const Faculty = require('./models/Faculty');
-const bcrypt = require('bcryptjs');
 const Publication = require('./models/Publication');
 const Project = require('./models/Project');
+const Patent = require('./models/Patent');
+const Workshop = require('./models/Workshop');
+const Nptel = require('./models/Nptel');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/research_profile';
@@ -16,6 +19,9 @@ const seedData = async () => {
     await Faculty.deleteMany({});
     await Publication.deleteMany({});
     await Project.deleteMany({});
+    await Patent.deleteMany({});
+    await Workshop.deleteMany({});
+    await Nptel.deleteMany({});
 
     // Create Faculty
     const faculty1 = await Faculty.create({
@@ -38,7 +44,7 @@ const seedData = async () => {
       researchInterests: ['Embedded Systems', 'IoT', 'VLSI']
     });
 
-    // Create Publications for faculty1
+    // Create Publications
     await Publication.create([
       {
         facultyId: faculty1._id,
@@ -58,7 +64,7 @@ const seedData = async () => {
       }
     ]);
 
-    // Create Projects for faculty1
+    // Create Projects
     await Project.create([
       {
         facultyId: faculty1._id,
@@ -69,7 +75,47 @@ const seedData = async () => {
       }
     ]);
 
-    console.log('Database seeded successfully!');
+    // Create Patents
+    await Patent.create([
+      {
+        facultyId: faculty1._id,
+        title: 'Intelligent System for Crop Monitoring',
+        patentNumber: '202341012345',
+        status: 'Published',
+        year: 2023
+      }
+    ]);
+
+    // Create Workshops
+    await Workshop.create([
+      {
+        facultyId: faculty1._id,
+        title: 'National Workshop on AI & Data Science',
+        role: 'Coordinator',
+        type: 'Organised',
+        date: new Date('2023-05-15')
+      },
+      {
+        facultyId: faculty1._id,
+        title: 'International FDP on Machine Learning',
+        role: 'Participant',
+        type: 'Attended',
+        date: new Date('2023-08-20')
+      }
+    ]);
+
+    // Create NPTEL Certifications
+    await Nptel.create([
+      {
+        facultyId: faculty1._id,
+        courseName: 'Deep Learning',
+        year: 2023,
+        score: 'Elite + Gold',
+        certificateUrl: '#'
+      }
+    ]);
+
+    console.log('Database seeded successfully with faculty, publications, projects, patents, workshops, and NPTEL certs!');
     process.exit();
   } catch (error) {
     console.error('Error seeding database:', error);
