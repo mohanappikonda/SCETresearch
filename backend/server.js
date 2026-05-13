@@ -24,11 +24,20 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/research_profile';
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error('FATAL ERROR: MONGO_URI is not defined in environment variables.');
+  process.exit(1);
+}
+
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('Successfully connected to MongoDB Cloud'))
+  .catch(err => {
+    console.error('MongoDB connection error details:', err.message);
+    console.log('Ensure you have whitelisted the Render IP in MongoDB Atlas.');
+  });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Backend Server is live and running on port ${PORT}`);
 });
