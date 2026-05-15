@@ -4,6 +4,7 @@ const Project = require('../models/Project');
 const Patent = require('../models/Patent');
 const Workshop = require('../models/Workshop');
 const Nptel = require('../models/Nptel');
+const XLSX = require('xlsx');
 
 // Get faculty profile with publications and projects
 exports.getFacultyProfile = async (req, res) => {
@@ -180,6 +181,34 @@ exports.getStats = async (req, res) => {
       facultyPerDept: facultyPerDept.map(item => ({ name: item._id, value: item.count })),
       pubsPerDept: pubsPerDept.map(item => ({ name: item._id, value: item.count }))
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Bulk import publications from Excel
+exports.bulkImportPublications = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'Please upload an Excel file.' });
+
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(sheet);
+
+    const facultyId = req.body.facultyId;
+    if (!facultyId) return res.status(400).json({ message: 'Faculty ID is required.' });
+
+    const publications = data.map(item => ({
+      facultyId,
+      title: item.Title || item.title,
+      venue: item.Venue || item.venue,
+      year: item.Year || item.year,
+      type: item.Type || item.type || 'Journal'
+    }));
+
+    await Publication.insertMany(publications);
+    res.status(201).json({ message: `Successfully imported ${publications.length} publications.` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

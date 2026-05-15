@@ -80,9 +80,9 @@ const seedData = async () => {
       {
         facultyId: faculty1._id,
         title: 'Intelligent System for Crop Monitoring',
-        patentNumber: '202341012345',
+        applicationNumber: '202341012345',
         status: 'Published',
-        year: 2023
+        dateOfFiling: new Date('2023-01-01')
       }
     ]);
 
@@ -110,8 +110,8 @@ const seedData = async () => {
         facultyId: faculty1._id,
         courseName: 'Deep Learning',
         year: 2023,
-        score: 'Elite + Gold',
-        certificateUrl: '#'
+        score: 95,
+        certificateType: 'Elite+Gold'
       }
     ]);
 

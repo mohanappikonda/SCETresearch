@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: storage });
+const memoryUpload = multer({ storage: multer.memoryStorage() });
 
 // Faculty Profile Routes
 router.get('/', facultyController.getAllFaculty);
@@ -34,5 +35,6 @@ router.post('/projects', auth, facultyController.addProject);
 router.post('/patents', auth, facultyController.addPatent);
 router.post('/workshops', auth, facultyController.addWorkshop);
 router.post('/nptel', auth, facultyController.addNptel);
+router.post('/bulk-import', auth, memoryUpload.single('file'), facultyController.bulkImportPublications);
 
 module.exports = router;

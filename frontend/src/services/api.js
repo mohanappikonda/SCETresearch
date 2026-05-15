@@ -26,5 +26,8 @@ export const addNptel = (data) => api.post('/faculty/nptel', data);
 export const uploadImage = (formData) => api.post('/faculty/upload', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 });
+export const bulkImport = (formData) => api.post('/faculty/bulk-import', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
 
 export default api;

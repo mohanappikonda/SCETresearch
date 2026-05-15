@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Row, Col, ListGroup, Badge, Spinner, Alert, Button } from 'react-bootstrap';
 import { Typography, Avatar, Box, Divider, Paper } from '@mui/material';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { 
   Description as PubIcon, 
   Assignment as ProjectIcon, 
@@ -10,16 +10,19 @@ import {
   School as NptelIcon,
   Email as EmailIcon,
   Business as DeptIcon,
-  ArrowBack as ArrowBackIcon
+  PictureAsPdf as PdfIcon
 } from '@mui/icons-material';
 import { getProfile } from '../services/api';
-import logo from '../assets/logo.png';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const ProfilePage = () => {
   const { email } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState(null);
+  const profileRef = useRef();
 
   useEffect(() => {
     getProfile(email || 'test@college.edu')
@@ -34,33 +37,50 @@ const ProfilePage = () => {
       });
   }, [email]);
 
+  const handleDownloadPdf = async () => {
+    setExporting(true);
+    const element = profileRef.current;
+    
+    // Temporarily hide buttons for the screenshot
+    const buttons = element.querySelectorAll('.no-print');
+    buttons.forEach(btn => btn.style.display = 'none');
+
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#f8fafc'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${data.faculty.name.replace(/\s+/g, '_')}_Portfolio.pdf`);
+    } catch (err) {
+      console.error('PDF Export Error:', err);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      buttons.forEach(btn => btn.style.display = 'block');
+      setExporting(false);
+    }
+  };
+
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><Spinner animation="grow" /></Box>;
   if (!data) return <Alert variant="warning" className="m-5">{error || 'Faculty not found'}</Alert>;
 
   return (
-    <Box sx={{ pb: 10 }}>
-      <Box mb={4}>
-        <Link 
-          to="/faculty" 
-          className="text-decoration-none d-inline-flex align-items-center gap-2"
-          style={{ color: 'var(--primary)', fontWeight: 600 }}
-        >
-          <ArrowBackIcon sx={{ fontSize: 20 }} />
-          Back to Faculty Directory
-        </Link>
-      </Box>
+    <Box sx={{ pb: 10 }} ref={profileRef}>
       {/* Profile Header */}
       <div className="premium-card p-5 mb-5 overflow-hidden position-relative">
         <Box sx={{ 
           position: 'absolute', top: 0, left: 0, right: 0, height: '8px', 
           background: 'linear-gradient(90deg, var(--primary), var(--accent))' 
         }} />
-        <Box sx={{ 
-          position: 'absolute', top: 20, right: 30, opacity: 0.1, 
-          width: '120px', pointerEvents: 'none' 
-        }}>
-          <img src={logo} alt="SCET Watermark" style={{ width: '100%', objectFit: 'contain' }} />
-        </Box>
         <Row className="align-items-center">
           <Col md="auto" className="mb-4 mb-md-0">
             <Avatar 
@@ -71,16 +91,29 @@ const ProfilePage = () => {
             </Avatar>
           </Col>
           <Col>
-            <Typography variant="h2" fontWeight="800" sx={{ mb: 1 }}>{data.faculty.name}</Typography>
-            <Box display="flex" gap={3} flexWrap="wrap">
-              <Box display="flex" alignItems="center" sx={{ color: 'var(--text-muted)' }}>
-                <DeptIcon sx={{ fontSize: 18, mr: 1 }} />
-                <Typography variant="subtitle1" fontWeight="500">{data.faculty.designation} • {data.faculty.department}</Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+              <Box>
+                <Typography variant="h2" fontWeight="800" sx={{ mb: 1 }}>{data.faculty.name}</Typography>
+                <Box display="flex" gap={3} flexWrap="wrap">
+                  <Box display="flex" alignItems="center" sx={{ color: 'var(--text-muted)' }}>
+                    <DeptIcon sx={{ fontSize: 18, mr: 1 }} />
+                    <Typography variant="subtitle1" fontWeight="500">{data.faculty.designation} • {data.faculty.department}</Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" sx={{ color: 'var(--text-muted)' }}>
+                    <EmailIcon sx={{ fontSize: 18, mr: 1 }} />
+                    <Typography variant="subtitle1" fontWeight="500">{data.faculty.email}</Typography>
+                  </Box>
+                </Box>
               </Box>
-              <Box display="flex" alignItems="center" sx={{ color: 'var(--text-muted)' }}>
-                <EmailIcon sx={{ fontSize: 18, mr: 1 }} />
-                <Typography variant="subtitle1" fontWeight="500">{data.faculty.email}</Typography>
-              </Box>
+              <Button 
+                variant="outline-primary" 
+                className="no-print rounded-pill px-4 fw-bold" 
+                onClick={handleDownloadPdf}
+                disabled={exporting}
+              >
+                {exporting ? <Spinner size="sm" className="me-2" /> : <PdfIcon className="me-2" />}
+                {exporting ? 'Generating...' : 'Download Portfolio'}
+              </Button>
             </Box>
             <Typography variant="body1" sx={{ mt: 3, maxWidth: 800, lineHeight: 1.8, fontSize: '1.1rem' }}>
               {data.faculty.bio || "No bio available."}
