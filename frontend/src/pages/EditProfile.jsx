@@ -279,7 +279,85 @@ const EditProfile = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Other modals (Project, Patent, Workshop, Nptel) would follow same pattern */}
+
+      {/* Project Modal */}
+      <Modal show={showProjModal} onHide={() => setShowProjModal(false)} centered>
+        <Modal.Header closeButton className="border-0 px-4 pt-4"><Modal.Title className="fw-bold">Add Project</Modal.Title></Modal.Header>
+        <Modal.Body className="px-4 pb-4">
+          <Form onSubmit={e => { e.preventDefault(); handleAddItem('proj', newProj); }}>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Project Title</Form.Label><Form.Control className="bg-light border-0" required onChange={e => setNewProj({...newProj, title: e.target.value})} /></Form.Group>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Funding Agency</Form.Label><Form.Control className="bg-light border-0" required onChange={e => setNewProj({...newProj, fundingAgency: e.target.value})} /></Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Amount (₹)</Form.Label><Form.Control className="bg-light border-0" type="number" onChange={e => setNewProj({...newProj, amount: e.target.value})} /></Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Status</Form.Label>
+                  <Form.Select className="bg-light border-0" onChange={e => setNewProj({...newProj, status: e.target.value})}>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Submitted">Submitted</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Button type="submit" className="btn-premium w-100">Add Project</Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Patent Modal */}
+      <Modal show={showPatModal} onHide={() => setShowPatModal(false)} centered>
+        <Modal.Header closeButton className="border-0 px-4 pt-4"><Modal.Title className="fw-bold">Add Patent</Modal.Title></Modal.Header>
+        <Modal.Body className="px-4 pb-4">
+          <Form onSubmit={e => { e.preventDefault(); handleAddItem('pat', newPat); }}>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Patent Title</Form.Label><Form.Control className="bg-light border-0" required onChange={e => setNewPat({...newPat, title: e.target.value})} /></Form.Group>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Application Number</Form.Label><Form.Control className="bg-light border-0" required onChange={e => setNewPat({...newPat, applicationNumber: e.target.value})} /></Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Filing Date</Form.Label><Form.Control className="bg-light border-0" type="date" onChange={e => setNewPat({...newPat, dateOfFiling: e.target.value})} /></Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Status</Form.Label>
+                  <Form.Select className="bg-light border-0" onChange={e => setNewPat({...newPat, status: e.target.value})}>
+                    <option value="Filed">Filed</option>
+                    <option value="Published">Published</option>
+                    <option value="Granted">Granted</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Button type="submit" className="btn-premium w-100">Add Patent</Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Workshop Modal */}
+      <Modal show={showWorkModal} onHide={() => setShowWorkModal(false)} centered>
+        <Modal.Header closeButton className="border-0 px-4 pt-4"><Modal.Title className="fw-bold">Add Workshop / FDP</Modal.Title></Modal.Header>
+        <Modal.Body className="px-4 pb-4">
+          <Form onSubmit={e => { e.preventDefault(); handleAddItem('work', newWork); }}>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Title</Form.Label><Form.Control className="bg-light border-0" required onChange={e => setNewWork({...newWork, title: e.target.value})} /></Form.Group>
+            <Form.Group className="mb-3"><Form.Label className="small fw-bold">Role (e.g., Coordinator, Participant)</Form.Label><Form.Control className="bg-light border-0" onChange={e => setNewWork({...newWork, role: e.target.value})} /></Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Date</Form.Label><Form.Control className="bg-light border-0" type="date" onChange={e => setNewWork({...newWork, date: e.target.value})} /></Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3"><Form.Label className="small fw-bold">Type</Form.Label>
+                  <Form.Select className="bg-light border-0" onChange={e => setNewWork({...newWork, type: e.target.value})}>
+                    <option value="Organised">Organised</option>
+                    <option value="Attended">Attended</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Button type="submit" className="btn-premium w-100">Add Workshop</Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+
       <Modal show={showNptelModal} onHide={() => setShowNptelModal(false)} centered>
         <Modal.Header closeButton className="border-0 px-4 pt-4"><Modal.Title className="fw-bold">Add NPTEL Certification</Modal.Title></Modal.Header>
         <Modal.Body className="px-4 pb-4">

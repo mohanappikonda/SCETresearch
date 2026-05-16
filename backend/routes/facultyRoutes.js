@@ -26,7 +26,8 @@ router.post('/update', auth, facultyController.updateFacultyProfile);
 // Image Upload
 router.post('/upload', auth, upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-  res.json({ imageUrl: `http://localhost:5000/uploads/${req.file.filename}` });
+  const port = process.env.PORT || 5001;
+  res.json({ imageUrl: `http://localhost:${port}/uploads/${req.file.filename}` });
 });
 
 // Publications & Projects
